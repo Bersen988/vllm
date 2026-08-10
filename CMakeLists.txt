@@ -472,7 +472,9 @@ if(VLLM_GPU_LANG STREQUAL "CUDA" OR VLLM_GPU_LANG STREQUAL "HIP")
       "csrc/libtorch_stable/quantization/w8a8/cutlass/scaled_mm_entry.cu"
       "csrc/libtorch_stable/quantization/fp4/nvfp4_quant_entry.cu"
       "csrc/libtorch_stable/quantization/fp4/nvfp4_scaled_mm_entry.cu"
-      "csrc/libtorch_stable/quantization/awq/gemm_kernels.cu"
+      # Disabled for Volta / sm_70:
+      # AWQ GEMM requires sm_75+.
+      # "csrc/libtorch_stable/quantization/awq/gemm_kernels.cu"
       "csrc/libtorch_stable/minimax_reduce_rms_kernel.cu")
 
     #
