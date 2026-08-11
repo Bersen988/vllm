@@ -575,6 +575,7 @@ STABLE_TORCH_LIBRARY_FRAGMENT(_C, ops) {
       "Tensor! scale, Tensor? scale_ub) -> "
       "()");
 
+  #ifndef VLLM_DISABLE_GPTQ_CUDA
   // Quantized GEMM for GPTQ.
   // Note: even though the C++ inferred schema is correct for this op, it seems
   // to prevent the meta function registry.
@@ -586,6 +587,7 @@ STABLE_TORCH_LIBRARY_FRAGMENT(_C, ops) {
 
   // Post processing for GPTQ.
   ops.def("gptq_shuffle(Tensor! q_weight, Tensor q_perm, int bit) -> ()");
+  #endif
 
   // Mamba selective scan kernel
   ops.def(
@@ -736,9 +738,11 @@ STABLE_TORCH_LIBRARY_IMPL(_C, CUDA, ops) {
   ops.impl("dynamic_per_token_scaled_fp8_quant",
            TORCH_BOX(&dynamic_per_token_scaled_fp8_quant));
 
+  #ifndef VLLM_DISABLE_GPTQ_CUDA
   // GPTQ kernels
   ops.impl("gptq_gemm", TORCH_BOX(&gptq_gemm));
   ops.impl("gptq_shuffle", TORCH_BOX(&gptq_shuffle));
+  #endif
 
   // Mamba kernels
   ops.impl("selective_scan_fwd", TORCH_BOX(&selective_scan_fwd));

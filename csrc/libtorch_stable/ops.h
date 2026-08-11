@@ -445,6 +445,7 @@ void dynamic_per_token_scaled_fp8_quant(
     torch::stable::Tensor& scale,
     std::optional<torch::stable::Tensor> const& scale_ub);
 
+#ifndef VLLM_DISABLE_GPTQ_CUDA
 // GPTQ kernels (shared CUDA/ROCm)
 torch::stable::Tensor gptq_gemm(torch::stable::Tensor a,
                                 torch::stable::Tensor b_q_weight,
@@ -455,6 +456,7 @@ torch::stable::Tensor gptq_gemm(torch::stable::Tensor a,
 
 void gptq_shuffle(torch::stable::Tensor q_weight, torch::stable::Tensor q_perm,
                   int64_t bit);
+#endif
 
 // Cache ops (shared CUDA/ROCm)
 void swap_blocks(torch::stable::Tensor& src, torch::stable::Tensor& dst,

@@ -398,7 +398,7 @@ if(VLLM_GPU_LANG STREQUAL "CUDA" OR VLLM_GPU_LANG STREQUAL "HIP")
     "csrc/libtorch_stable/quantization/w8a8/int8/per_token_group_quant.cu"
     "csrc/libtorch_stable/permute_cols.cu"
     # Disabled for Volta / sm_70:
-    # GPTQ q_gemm uses CUDA functionality that does not compile for sm_70.
+    # GPTQ q_gemm uses CUDA functionality that does not compile for sm_70. VLLM_DISABLE_GPTQ_CUDA
     # "csrc/libtorch_stable/quantization/gptq/q_gemm.cu"
     "csrc/libtorch_stable/pos_encoding_kernels.cu"
     "csrc/libtorch_stable/fused_qknorm_rope_kernel.cu"
@@ -469,7 +469,10 @@ if(VLLM_GPU_LANG STREQUAL "CUDA" OR VLLM_GPU_LANG STREQUAL "HIP")
 
     # Disabled for Volta / sm_70.
     # "csrc/libtorch_stable/quantization/awq/gemm_kernels.cu"
-    add_compile_definitions(VLLM_DISABLE_AWQ_CUDA)
+    add_compile_definitions(
+        VLLM_DISABLE_AWQ_CUDA
+        VLLM_DISABLE_GPTQ_CUDA
+    )
 
     list(APPEND VLLM_STABLE_EXT_SRC
       "csrc/libtorch_stable/cutlass_extensions/common.cpp"
@@ -477,7 +480,7 @@ if(VLLM_GPU_LANG STREQUAL "CUDA" OR VLLM_GPU_LANG STREQUAL "HIP")
       "csrc/libtorch_stable/quantization/fp4/nvfp4_quant_entry.cu"
       "csrc/libtorch_stable/quantization/fp4/nvfp4_scaled_mm_entry.cu"
       # Disabled for Volta / sm_70:
-      # AWQ GEMM requires sm_75+.
+      # AWQ GEMM requires sm_75+. VLLM_DISABLE_GPTQ_CUDA
       # "csrc/libtorch_stable/quantization/awq/gemm_kernels.cu"
       "csrc/libtorch_stable/minimax_reduce_rms_kernel.cu")
 
