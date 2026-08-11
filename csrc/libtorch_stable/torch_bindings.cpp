@@ -311,6 +311,8 @@ STABLE_TORCH_LIBRARY_FRAGMENT(_C, ops) {
       "sm100_cutlass_mla_get_workspace_size(int max_seq_len, int num_batches,"
       "                                     int sm_count, int num_kv_splits) "
       "-> int");
+
+  #ifndef VLLM_DISABLE_AWQ_CUDA
   // Quantized GEMM for AWQ.
   ops.def(
       "awq_gemm(Tensor _in_feats, Tensor _kernel, Tensor _scaling_factors, "
@@ -320,6 +322,7 @@ STABLE_TORCH_LIBRARY_FRAGMENT(_C, ops) {
   ops.def(
       "awq_dequantize(Tensor _kernel, Tensor _scaling_factors, "
       "Tensor _zeros, SymInt split_k_iters, int thx, int thy) -> Tensor");
+  #endif
 
   // DeepSeek V3 fused A GEMM (SM 9.0+, bf16 only, 1-16 tokens).
   // conditionally compiled so impl registration is in source file
@@ -648,9 +651,11 @@ STABLE_TORCH_LIBRARY_IMPL(_C, CUDA, ops) {
   // mxfp4_experts_quant: registered in mxfp4_experts_quant.cu (SM100 only).
   // W4A8 ops: registered in w4a8_mm_entry.cu / w4a8_grouped_mm_entry.cu.
 
+  #ifndef VLLM_DISABLE_AWQ_CUDA
   // AWQ ops
   ops.impl("awq_gemm", TORCH_BOX(&awq_gemm));
   ops.impl("awq_dequantize", TORCH_BOX(&awq_dequantize));
+  #endif
 
   // DSV3 fused A GEMM: conditionally compiled so impl registration is in
   // source file (dsv3_fused_a_gemm.cu)

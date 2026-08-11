@@ -162,6 +162,7 @@ void cutlass_mxfp4_group_mm(torch::stable::Tensor& output,
                             const torch::stable::Tensor& expert_offsets,
                             const torch::stable::Tensor& sf_offsets);
 
+#ifndef VLLM_DISABLE_AWQ_CUDA
 // AWQ ops
 torch::stable::Tensor awq_gemm(torch::stable::Tensor _in_feats,
                                torch::stable::Tensor _kernel,
@@ -174,6 +175,7 @@ torch::stable::Tensor awq_dequantize(torch::stable::Tensor _kernel,
                                      torch::stable::Tensor _zeros,
                                      int64_t split_k_iters, int64_t thx,
                                      int64_t thy);
+#endif
 
 // DSV3 fused A GEMM: conditionally compiled so declaration and impl
 // registration are in the source file (dsv3_fused_a_gemm.cu)

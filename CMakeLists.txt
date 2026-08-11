@@ -467,6 +467,10 @@ if(VLLM_GPU_LANG STREQUAL "CUDA" OR VLLM_GPU_LANG STREQUAL "HIP")
     endif()
     FetchContent_MakeAvailable(cutlass)
 
+    # Disabled for Volta / sm_70.
+    # "csrc/libtorch_stable/quantization/awq/gemm_kernels.cu"
+    add_compile_definitions(VLLM_DISABLE_AWQ_CUDA)
+
     list(APPEND VLLM_STABLE_EXT_SRC
       "csrc/libtorch_stable/cutlass_extensions/common.cpp"
       "csrc/libtorch_stable/quantization/w8a8/cutlass/scaled_mm_entry.cu"
