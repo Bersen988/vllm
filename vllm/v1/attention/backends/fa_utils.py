@@ -17,14 +17,27 @@ logger = init_logger(__name__)
 # This module-level flag avoids repeated import attempts and ensures
 # consistent behavior (similar to IS_AITER_FOUND in _aiter_ops.py).
 _ROCM_FLASH_ATTN_AVAILABLE = False
+_CUDA_FLASH_ATTN_AVAILABLE = False
 
 if current_platform.is_cuda():
     from vllm._custom_ops import reshape_and_cache_flash
-    from vllm.vllm_flash_attn import (  # type: ignore[attr-defined]
-        compile_flash_attn_varlen_func_from_specs,
-        flash_attn_varlen_func,
-        get_scheduler_metadata,
-    )
+    try:
+        from vllm.vllm_flash_attn import (  # type: ignore[attr-defined]
+            compile_flash_attn_varlen_func_from_specs,
+            flash_attn_varlen_func,
+            get_scheduler_metadata,
+        )
+    except ImportError:
+        _CUDA_FLASH_ATTN_AVAILABLE = False
+        compile_flash_attn_varlen_func_from_specs = None
+
+        def flash_attn_varlen_func(*args: Any, **kwargs: Any) -> Any:
+            raise RuntimeError(
+                "FlashAttention is unavailable on this CUDA architecture."
+            )
+
+        def get_scheduler_metadata(*args: Any, **kwargs: Any) -> None:
+            return None
 
 elif current_platform.is_xpu():
     from vllm import _custom_ops as ops
@@ -322,8 +335,14 @@ def is_flash_attn_varlen_func_available() -> bool:
     Returns:
         bool: True if a working flash_attn_varlen_func implementation is available.
     """
-    if current_platform.is_cuda() or current_platform.is_xpu():
-        # CUDA and XPU always have flash_attn_varlen_func available
+    # if current_platform.is_cuda() or current_platform.is_xpu():
+    #     # CUDA and XPU always have flash_attn_varlen_func available
+    #     return True
+
+    if current_platform.is_cuda():
+        return _CUDA_FLASH_ATTN_AVAILABLE
+
+    if current_platform.is_xpu():
         return True
 
     if current_platform.is_rocm():
